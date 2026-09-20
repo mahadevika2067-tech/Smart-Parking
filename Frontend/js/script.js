@@ -149,7 +149,7 @@ async function loadVehicles() {
     try {
 
         let response = await fetch(
-            "http://localhost:8080/api/vehicles"
+            "https://smart-parking-production-dc9c.up.railway.app"
         );
 
         let vehicles = await response.json();
