@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ParkSmart - Payment</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 ParkSmart
+    </div>
+
+    <nav>
+
+        <a href="dashboard.html">Dashboard</a>
+        <a href="parking.html">Find Parking</a>
+        <a href="bookings.html">My Bookings</a>
+
+        <button
+            onclick="logoutUser()"
+            class="logout-button">
+
+            Logout
+
+        </button>
+
+    </nav>
+
+</header>
+
+
+<main class="dashboard">
+
+    <div class="welcome">
+
+        <div>
+
+            <h1>Payment 💳</h1>
+
+            <p>
+                Complete your payment to confirm the parking booking.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <section class="booking-form-card">
+
+        <h2>Booking Summary</h2>
+
+
+        <div class="booking-summary">
+
+            <p>
+                Parking Location:
+                <strong id="paymentParking">-</strong>
+            </p>
+
+            <p>
+                Slot:
+                <strong id="paymentSlot">-</strong>
+            </p>
+
+            <p>
+                Vehicle:
+                <strong id="paymentVehicle">-</strong>
+            </p>
+
+            <p>
+                Date:
+                <strong id="paymentDate">-</strong>
+            </p>
+
+            <p>
+                Time:
+                <strong id="paymentTime">-</strong>
+            </p>
+
+            <p>
+                Duration:
+                <strong id="paymentDuration">-</strong>
+            </p>
+
+            <p id="extensionRow" style="display:none;">
+                Extension:
+                <strong id="paymentExtension">-</strong>
+            </p>
+
+            <p>
+                Total Amount:
+                <strong id="paymentAmount">₹0</strong>
+            </p>
+
+        </div>
+
+
+        <h2>Choose Payment Method</h2>
+
+
+        <label class="payment-option">
+
+            <input
+                type="radio"
+                name="payment"
+                value="UPI"
+                checked>
+
+            UPI
+
+        </label>
+
+
+        <label class="payment-option">
+
+            <input
+                type="radio"
+                name="payment"
+                value="Card">
+
+            Debit / Credit Card
+
+        </label>
+
+
+        <label class="payment-option">
+
+            <input
+                type="radio"
+                name="payment"
+                value="Net Banking">
+
+            Net Banking
+
+        </label>
+
+
+        <button
+            class="primary-button full-button"
+            onclick="makePayment()">
+
+            Pay & Confirm Booking
+
+        </button>
+
+    </section>
+
+</main>
+
+
+<script src="js/script.js"></script>
+
+
+<script>
+
+function loadPaymentDetails() {
+
+    let slot =
+        localStorage.getItem("selectedSlot");
+
+    let vehicle =
+        localStorage.getItem("selectedVehicle");
+
+    let date =
+        localStorage.getItem("bookingDate");
+
+    let startTime =
+        localStorage.getItem("startTime");
+
+    let duration =
+        parseInt(localStorage.getItem("duration")) || 1;
+    let parkingName =
+    localStorage.getItem("selectedParkingName");
+
+let parkingLocation =
+    localStorage.getItem("selectedParkingLocation");
+
+document.getElementById("paymentParking").textContent =
+    parkingName + " - " + parkingLocation;
+
+
+    document.getElementById("paymentSlot").textContent =
+        slot || "-";
+
+    document.getElementById("paymentVehicle").textContent =
+        vehicle || "-";
+
+    document.getElementById("paymentDate").textContent =
+        date || "-";
+
+    document.getElementById("paymentTime").textContent =
+        startTime || "-";
+
+    document.getElementById("paymentDuration").textContent =
+        duration + " Hour(s)";
+
+
+    let extensionHours =
+        parseFloat(
+            localStorage.getItem("extensionHours")
+        ) || 0;
+
+
+    if (extensionHours > 0) {
+
+        let extensionFee =
+            parseFloat(
+                localStorage.getItem("extensionFee")
+            ) || 0;
+
+
+        document.getElementById("extensionRow").style.display =
+            "block";
+
+
+        document.getElementById("paymentExtension").textContent =
+            extensionHours + " Hour(s) - ₹" + extensionFee;
+
+
+        document.getElementById("paymentAmount").textContent =
+            "₹" + extensionFee;
+
+    } else {
+
+        let parkingPrice =
+    parseFloat(
+        localStorage.getItem("selectedParkingPrice")
+    ) || 0;
+
+let amount =
+    parkingPrice * duration;
+
+
+        document.getElementById("paymentAmount").textContent =
+            "₹" + amount;
+    }
+}
+
+async function makePayment() {
+
+    let bookingId =
+        parseInt(
+            localStorage.getItem("bookingId")
+        );
+
+    if (!bookingId) {
+        alert("Booking ID not found.");
+        return;
+    }
+
+
+    let duration =
+        parseInt(
+            localStorage.getItem("duration")
+        ) || 1;
+
+
+    let extensionHours =
+        parseFloat(
+            localStorage.getItem("extensionHours")
+        ) || 0;
+
+
+    let paymentType =
+        localStorage.getItem("paymentType");
+
+
+    let amount;
+
+
+    if (paymentType === "extension") {
+
+        amount =
+            parseFloat(
+                localStorage.getItem("extensionFee")
+            ) || 0;
+
+    } else {
+
+        let parkingPrice =
+    parseFloat(
+        localStorage.getItem("selectedParkingPrice")
+    ) || 0;
+
+amount =
+    parkingPrice * duration;
+    
+    }
+
+
+    let method =
+        document.querySelector(
+            'input[name="payment"]:checked'
+        ).value;
+
+
+    let payment = {
+
+        bookingId: bookingId,
+
+        amount: amount,
+
+        paymentMethod: method,
+
+        paymentStatus: "Paid"
+
+    };
+
+
+    try {
+
+        let response =
+            await fetch(
+                "http://localhost:8080/api/payments",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(payment)
+                }
+            );
+
+
+        if (!response.ok) {
+
+            alert("Payment failed!");
+
+            return;
+        }
+
+
+        if (paymentType === "extension") {
+
+            let newEndTime =
+                localStorage.getItem("newEndTime");
+
+
+            let updateResponse =
+                await fetch(
+                    "http://localhost:8080/api/bookings/"
+                    + bookingId
+                    + "/extend?newEndTime="
+                    + encodeURIComponent(newEndTime),
+                    {
+                        method: "PUT"
+                    }
+                );
+
+
+            if (!updateResponse.ok) {
+
+                alert("Payment successful, but booking time update failed.");
+
+                return;
+            }
+        }
+
+
+        localStorage.setItem(
+            "paymentAmount",
+            amount
+        );
+
+
+        alert("Payment successful!");
+
+
+        window.location.href =
+            "confirmation.html";
+
+
+    } catch (error) {
+
+        alert("Backend is not connected!");
+
+        console.log(error);
+    }
+}
+
+
+loadPaymentDetails();
+
+</script>
+
+
+</body>
+
+</html>

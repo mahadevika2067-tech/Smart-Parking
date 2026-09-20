@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ParkSmart - My Vehicles</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 ParkSmart
+    </div>
+
+    <nav>
+
+        <a href="dashboard.html">
+            Dashboard
+        </a>
+
+        <a href="parking.html">
+            Find Parking
+        </a>
+
+        <a href="bookings.html">
+            My Bookings
+        </a>
+
+        <button
+            onclick="logoutUser()"
+            class="logout-button">
+
+            Logout
+
+        </button>
+
+    </nav>
+
+</header>
+
+
+<main class="dashboard">
+
+    <div class="welcome">
+
+        <div>
+
+            <h1>My Vehicles 🚗</h1>
+
+            <p>
+                Manage your registered vehicles.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Add Vehicle -->
+
+    <section class="search-section">
+
+        <h2>Add New Vehicle</h2>
+
+        <div class="vehicle-form">
+
+            <input
+                type="text"
+                id="vehicleNumber"
+                placeholder="Vehicle Number"
+                required>
+
+            <input
+                type="text"
+                id="vehicleModel"
+                placeholder="Vehicle Model"
+                required>
+
+            <select id="vehicleType" required>
+
+                <option value="">
+                    Select Vehicle Type
+                </option>
+
+                <option value="Car">
+                    Car
+                </option>
+
+                <option value="Bike">
+                    Bike
+                </option>
+
+                <option value="SUV">
+                    SUV
+                </option>
+
+            </select>
+
+            <button
+                class="primary-button"
+                onclick="addVehicle()">
+
+                + Add Vehicle
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- Vehicles -->
+
+    <h2 class="page-heading">
+        Registered Vehicles
+    </h2>
+
+    <section
+        class="vehicle-container"
+        id="vehicleContainer">
+
+        <!-- Vehicles will be loaded from MySQL -->
+
+    </section>
+
+</main>
+
+
+<script src="js/script.js"></script>
+
+</body>
+
+</html>

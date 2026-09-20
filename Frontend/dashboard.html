@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ParkSmart - Dashboard</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 ParkSmart
+    </div>
+
+    <nav>
+
+        <a href="dashboard.html">
+            Dashboard
+        </a>
+
+        <a href="parking.html">
+            Find Parking
+        </a>
+
+        <a href="bookings.html">
+    My Bookings
+</a>
+
+<button
+    onclick="showNotification()"
+    class="notification-button">
+
+    🔔
+    <span id="notificationBadge" class="notification-badge">1</span>
+
+</button>
+
+<button
+    onclick="logoutUser()"
+    class="logout-button">
+            Logout
+
+        </button>
+
+    </nav>
+
+</header>
+
+
+<main class="dashboard">
+
+    <!-- Welcome Section -->
+
+    <div class="welcome">
+
+        <div>
+
+            <h1>Welcome to ParkSmart 🚗</h1>
+
+            <p>
+                Find, book and manage your parking easily.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Dashboard Cards -->
+
+    <section class="dashboard-cards">
+
+
+        <!-- Find Parking -->
+
+        <div class="dashboard-card">
+
+            <div class="card-icon">
+                🅿️
+            </div>
+
+            <h2>Find Parking</h2>
+
+            <p>
+                Find available parking spaces near your destination.
+            </p>
+
+            <a
+                href="parking.html"
+                class="primary-button">
+
+                Find Parking
+
+            </a>
+
+        </div>
+
+
+        <!-- My Vehicles -->
+
+        <div class="dashboard-card">
+
+            <div class="card-icon">
+                🚗
+            </div>
+
+            <h2>My Vehicles</h2>
+
+            <p>
+                Add and manage your registered vehicles.
+            </p>
+
+            <a
+                href="vehicles.html"
+                class="primary-button">
+
+                Manage Vehicles
+
+            </a>
+
+        </div>
+
+
+        <!-- My Bookings -->
+
+        <div class="dashboard-card">
+
+            <div class="card-icon">
+                📅
+            </div>
+
+            <h2>My Bookings</h2>
+
+            <p>
+                View your current and previous parking bookings.
+            </p>
+
+            <a
+                href="bookings.html"
+                class="primary-button">
+
+                View Bookings
+
+            </a>
+
+        </div>
+
+
+        <!-- Extend Parking -->
+
+        <div class="dashboard-card">
+
+            <div class="card-icon">
+                ⏰
+            </div>
+
+            <h2>Extend Parking</h2>
+
+            <p>
+                Extend your parking time when you need more time.
+            </p>
+
+            <a
+                href="extend.html"
+                class="primary-button">
+
+                Extend Time
+
+            </a>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- Quick Actions -->
+
+    <section class="search-section">
+
+        <h2>Quick Actions</h2>
+
+        <div class="quick-actions">
+
+            <a
+                href="parking.html"
+                class="secondary-button">
+
+                🔍 Find Parking
+
+            </a>
+
+            <a
+                href="vehicles.html"
+                class="secondary-button">
+
+                🚗 My Vehicles
+
+            </a>
+
+            <a
+                href="bookings.html"
+                class="secondary-button">
+
+                📋 My Bookings
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- ParkSmart Information -->
+
+    <section class="search-section">
+
+        <h2>ParkSmart Services</h2>
+
+        <p>
+            ParkSmart helps you find available parking,
+            reserve parking slots, manage your vehicles,
+            make payments and extend parking time when required.
+        </p>
+
+    </section>
+
+    <div id="notificationBox" class="notification-box">
+    <strong>🔔 Parking Reminder</strong>
+    <p id="notificationText">
+        No new notifications.
+    </p>
+</div>
+
+</main>
+
+
+<script src="js/script.js"></script>
+
+<script>
+
+async function showNotification() {
+
+    let box = document.getElementById("notificationBox");
+    let text = document.getElementById("notificationText");
+
+    box.classList.toggle("show");
+
+    try {
+
+        let response =
+            await fetch("http://localhost:8080/api/bookings");
+
+        let bookings = await response.json();
+
+        let now = new Date();
+        let relevantBooking = null;
+        let relevantStart = null;
+        let relevantEnd = null;
+
+        for (let booking of bookings) {
+
+            if (booking.status === "Cancelled") {
+                continue;
+            }
+
+            let dateParts = booking.bookingDate.split("-");
+
+            let year = Number(dateParts[0]);
+            let month = Number(dateParts[1]) - 1;
+            let day = Number(dateParts[2]);
+
+            let startParts = booking.startTime.split(":");
+            let endParts = booking.endTime.split(":");
+
+            let start = new Date(
+                year,
+                month,
+                day,
+                Number(startParts[0]),
+                Number(startParts[1])
+            );
+
+            let end = new Date(
+                year,
+                month,
+                day,
+                Number(endParts[0]),
+                Number(endParts[1])
+            );
+
+            if (end <= start) {
+                end.setDate(end.getDate() + 1);
+            }
+
+            let reminderStart =
+                new Date(start.getTime() - 30 * 60 * 1000);
+
+            // Active parking
+            if (now >= start && now <= end) {
+                relevantBooking = booking;
+                relevantStart = start;
+                relevantEnd = end;
+                break;
+            }
+
+            // Upcoming parking within 30 minutes
+            if (now >= reminderStart && now < start) {
+                relevantBooking = booking;
+                relevantStart = start;
+                relevantEnd = end;
+                break;
+            }
+        }
+
+        if (!relevantBooking) {
+
+            text.textContent =
+                "🔔 No parking reminders right now.";
+
+            return;
+        }
+
+        // Parking already started
+        if (now >= relevantStart) {
+
+            text.textContent =
+                "⚠️ Your parking time has started. " +
+                "Please reach " +
+                relevantBooking.parkingName +
+                ". Slot: " +
+                relevantBooking.slotNumber;
+
+        } else {
+
+            // Parking has not started yet
+            let minutes =
+                Math.ceil(
+                    (relevantStart.getTime() - now.getTime())
+                    / (1000 * 60)
+                );
+
+            text.textContent =
+                "⏰ Your parking at " +
+                relevantBooking.parkingName +
+                " starts in " +
+                minutes +
+                " minutes. " +
+                "Slot: " +
+                relevantBooking.slotNumber;
+        }
+
+    } catch (error) {
+
+        console.log(error);
+
+        text.textContent =
+            "Unable to load parking notification.";
+    }
+}
+
+async function updateNotificationBadge() {
+
+    let badge = document.getElementById("notificationBadge");
+
+    try {
+
+        let response = await fetch(
+            "http://localhost:8080/api/bookings"
+        );
+
+        let bookings = await response.json();
+
+        let now = new Date();
+        let activeReminder = false;
+
+        for (let booking of bookings) {
+
+            // Ignore cancelled bookings
+            if (booking.status === "Cancelled") {
+                continue;
+            }
+
+            // Get date parts
+            let dateParts = booking.bookingDate.split("-");
+
+            let year = Number(dateParts[0]);
+            let month = Number(dateParts[1]) - 1;
+            let day = Number(dateParts[2]);
+
+            // Get start time
+            let startParts = booking.startTime.split(":");
+
+            let start = new Date(
+                year,
+                month,
+                day,
+                Number(startParts[0]),
+                Number(startParts[1]),
+                0
+            );
+
+            // Get end time
+            let endParts = booking.endTime.split(":");
+
+            let end = new Date(
+                year,
+                month,
+                day,
+                Number(endParts[0]),
+                Number(endParts[1]),
+                0
+            );
+
+            // If end time is after midnight
+            if (end <= start) {
+                end.setDate(end.getDate() + 1);
+            }
+
+            // Reminder starts 30 minutes before parking
+            let reminderStart =
+                new Date(start.getTime() - 30 * 60 * 1000);
+
+            // Check current time
+            if (now >= reminderStart && now <= end) {
+
+                activeReminder = true;
+                break;
+            }
+        }
+
+        if (activeReminder) {
+            badge.style.display = "flex";
+        } else {
+            badge.style.display = "none";
+        }
+
+    } catch (error) {
+
+        console.log(error);
+        badge.style.display = "none";
+    }
+}
+
+updateNotificationBadge();
+
+setInterval(updateNotificationBadge, 30000);
+
+</script>
+
+</body>
+
+</html>

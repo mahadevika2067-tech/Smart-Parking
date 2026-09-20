@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ParkSmart - Select Parking Slot</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 ParkSmart
+    </div>
+
+    <nav>
+
+        <a href="dashboard.html">
+            Dashboard
+        </a>
+
+        <a href="parking.html">
+            Find Parking
+        </a>
+
+        <a href="bookings.html">
+            My Bookings
+        </a>
+
+        <button
+            onclick="logoutUser()"
+            class="logout-button">
+
+            Logout
+
+        </button>
+
+    </nav>
+
+</header>
+
+
+<main class="dashboard">
+
+    <div class="welcome">
+
+        <div>
+
+            <h1>Select Parking Slot 🅿️</h1>
+
+            <p id="selectedParking">
+    Loading parking location...
+</p>
+
+        </div>
+
+    </div>
+
+
+    <section class="search-section">
+
+        <h2>Choose an Available Slot</h2>
+
+        <p class="slot-info">
+            🟢 Available &nbsp;&nbsp;
+            🔴 Occupied &nbsp;&nbsp;
+            🔵 Selected
+        </p>
+
+    </section>
+
+
+    <!-- Parking Slots -->
+
+    <section class="slot-container" id="slotContainer">
+
+        <!-- Slots will come from MySQL -->
+
+    </section>
+
+
+    <section class="slot-action">
+
+        <p>
+            Select a slot to continue with your booking.
+        </p>
+
+        <button
+            class="primary-button"
+            onclick="continueBooking()">
+
+            Continue →
+
+        </button>
+
+    </section>
+
+
+</main>
+
+
+<script src="js/script.js"></script>
+
+<script>
+
+async function loadSlots() {
+
+    try {
+
+        let response =
+            await fetch("http://localhost:8080/api/slots");
+
+        let slots =
+            await response.json();
+
+        let container =
+            document.getElementById("slotContainer");
+
+        container.innerHTML = "";
+
+        slots.forEach(slot => {
+
+            let button =
+                document.createElement("button");
+
+            button.innerText =
+                slot.slotNumber;
+
+            button.classList.add("slot");
+
+            if (slot.status === "Available") {
+
+                button.classList.add("available");
+
+                button.onclick = function() {
+
+                    document
+                        .querySelectorAll(".slot")
+                        .forEach(s =>
+                            s.classList.remove("selected")
+                        );
+
+                    button.classList.add("selected");
+
+                    localStorage.setItem(
+                        "selectedSlot",
+                        slot.slotNumber
+                    );
+
+                };
+
+            } else {
+
+                button.classList.add("occupied");
+                button.disabled = true;
+
+            }
+
+            container.appendChild(button);
+
+        });
+
+    } catch (error) {
+
+        console.log(error);
+
+    }
+
+}
+
+
+function continueBooking() {
+
+    let selectedSlot =
+        localStorage.getItem("selectedSlot");
+
+    if (!selectedSlot) {
+
+        alert("Please select a parking slot.");
+
+        return;
+
+    }
+
+    window.location.href =
+        "booking.html";
+
+}
+let parkingName =
+    localStorage.getItem("selectedParkingName");
+
+let parkingLocation =
+    localStorage.getItem("selectedParkingLocation");
+
+document.getElementById("selectedParking").textContent =
+    parkingName + " - " + parkingLocation;
+
+loadSlots();
+
+</script>
+
+
+</body>
+
+</html>

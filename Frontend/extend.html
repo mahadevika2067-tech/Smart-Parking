@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ParkSmart - Extend Parking Time</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 ParkSmart
+    </div>
+
+    <nav>
+
+        <a href="dashboard.html">Dashboard</a>
+        <a href="parking.html">Find Parking</a>
+        <a href="bookings.html">My Bookings</a>
+        <a href="vehicles.html">My Vehicles</a>
+
+        <button
+            onclick="logoutUser()"
+            class="logout-button">
+            Logout
+        </button>
+
+    </nav>
+
+</header>
+
+
+<main class="dashboard">
+
+    <div class="welcome">
+
+        <div>
+
+            <h1>
+                Extend Parking Time ⏰
+            </h1>
+
+            <p>
+                Extend your current parking session if you need more time.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <section class="booking-form-card">
+
+        <h2>Current Booking</h2>
+
+
+        <div class="booking-summary">
+
+            <p>
+                Parking:
+                <strong id="extendParking">-</strong>
+            </p>
+
+            <p>
+                Slot:
+                <strong id="extendSlot">-</strong>
+            </p>
+
+            <p>
+                Vehicle:
+                <strong id="extendVehicle">-</strong>
+            </p>
+
+            <p>
+                Current End Time:
+                <strong id="currentEndTime">-</strong>
+            </p>
+
+        </div>
+
+
+        <h2>Select Additional Time</h2>
+
+
+        <label>
+            Extension Duration
+        </label>
+
+        <select
+            id="extensionDuration"
+            onchange="calculateExtension()">
+
+            <option value="0.5">
+                30 Minutes
+            </option>
+
+            <option value="1">
+                1 Hour
+            </option>
+
+            <option value="2">
+                2 Hours
+            </option>
+
+            <option value="3">
+                3 Hours
+            </option>
+
+        </select>
+
+
+        <div class="booking-summary">
+
+            <p>
+                Additional Parking Fee:
+                <strong id="extensionFee">₹15</strong>
+            </p>
+
+            <p>
+                New End Time:
+                <strong id="newEndTime">-</strong>
+            </p>
+
+        </div>
+
+
+        <button
+            class="primary-button full-button"
+            onclick="continueExtension()">
+
+            Continue to Payment
+
+        </button>
+
+    </section>
+
+</main>
+
+
+<script src="js/script.js"></script>
+
+
+<script>
+
+async function loadBookingDetails() {
+
+    let bookingId =
+        localStorage.getItem("extensionBookingId");
+
+    if (!bookingId) {
+        alert("Please select a booking first.");
+        window.location.href = "bookings.html";
+        return;
+    }
+
+    try {
+
+        let response =
+            await fetch(
+                "http://localhost:8080/api/bookings"
+            );
+
+        let bookings =
+            await response.json();
+
+        let booking =
+            bookings.find(
+                b => b.bookingId == bookingId
+            );
+
+        if (!booking) {
+            alert("Booking not found.");
+            window.location.href = "bookings.html";
+            return;
+        }
+
+        document.getElementById("extendParking").textContent =
+            booking.parkingName + " - " + booking.parkingLocation;
+
+        document.getElementById("extendSlot").textContent =
+            booking.slotNumber;
+
+        document.getElementById("extendVehicle").textContent =
+            booking.vehicleNumber;
+
+        document.getElementById("currentEndTime").textContent =
+            booking.endTime;
+
+        // Save the selected booking details
+        localStorage.setItem(
+            "selectedSlot",
+            booking.slotNumber
+        );
+
+        localStorage.setItem(
+            "selectedVehicle",
+            booking.vehicleNumber
+        );
+
+        localStorage.setItem(
+            "startTime",
+            booking.startTime
+        );
+
+        localStorage.setItem(
+            "duration",
+            "0"
+        );
+
+    } catch (error) {
+
+        console.log(error);
+
+        alert("Unable to load booking details.");
+
+    }
+
+    calculateExtension();
+}
+
+function calculateExtension() {
+
+    let extraHours =
+        parseFloat(
+            document.getElementById("extensionDuration").value
+        );
+
+    let parkingPrice =
+        parseFloat(
+            localStorage.getItem("selectedParkingPrice")
+        ) || 0;
+
+    let fee =
+        parkingPrice * extraHours;
+
+    document.getElementById("extensionFee").textContent =
+        "₹" + fee;
+
+
+    let currentEndTime =
+        document.getElementById("currentEndTime").textContent;
+
+    if (currentEndTime && currentEndTime !== "-") {
+
+        let time =
+            new Date("2000-01-01T" + currentEndTime);
+
+        time.setMinutes(
+            time.getMinutes() + (extraHours * 60)
+        );
+
+        let newEndTime =
+            time.toTimeString().slice(0, 5);
+
+        document.getElementById("newEndTime").textContent =
+            newEndTime;
+    }
+}
+
+function continueExtension() {
+
+    let extraHours =
+        parseFloat(
+            document.getElementById("extensionDuration").value
+        );
+
+    let parkingPrice =
+        parseFloat(
+            localStorage.getItem("selectedParkingPrice")
+        ) || 0;
+
+    let fee =
+        parkingPrice * extraHours;
+
+    let newEndTime =
+        document.getElementById("newEndTime").textContent;
+
+    let bookingId =
+        localStorage.getItem("extensionBookingId");
+
+
+    localStorage.setItem(
+        "paymentType",
+        "extension"
+    );
+
+    localStorage.setItem(
+        "extensionHours",
+        extraHours
+    );
+
+    localStorage.setItem(
+        "extensionFee",
+        fee
+    );
+
+    localStorage.setItem(
+        "newEndTime",
+        newEndTime
+    );
+
+    localStorage.setItem(
+        "bookingId",
+        bookingId
+    );
+
+
+    window.location.href =
+        "payment.html";
+}
+
+loadBookingDetails();
+
+</script>
+
+
+</body>
+
+</html>

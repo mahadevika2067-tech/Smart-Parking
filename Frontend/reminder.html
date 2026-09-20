@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ParkSmart - Reminder</title>
+
+    <link rel="stylesheet"
+          href="css/style.css">
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 ParkSmart
+    </div>
+
+    <nav>
+
+        <a href="dashboard.html">
+            Dashboard
+        </a>
+
+        <a href="parking.html">
+            Find Parking
+        </a>
+
+        <a href="bookings.html">
+            My Bookings
+        </a>
+
+        <button
+            onclick="logoutUser()"
+            class="logout-button">
+
+            Logout
+
+        </button>
+
+    </nav>
+
+</header>
+
+
+<main class="dashboard">
+
+    <section class="reminder-card">
+
+        <div class="reminder-icon">
+            🔔
+        </div>
+
+
+        <h1>
+            Parking Reminder
+        </h1>
+
+
+        <p>
+            Your parking reservation is active.
+        </p>
+
+
+        <div class="booking-summary">
+
+            <p>
+                Parking:
+                <strong id="reminderParking">
+                    -
+                </strong>
+            </p>
+
+
+            <p>
+                Slot:
+                <strong id="reminderSlot">
+                    -
+                </strong>
+            </p>
+
+
+            <p>
+                Vehicle:
+                <strong id="reminderVehicle">
+                    -
+                </strong>
+            </p>
+
+
+            <p>
+                Reserved Time:
+                <strong id="reminderTime">
+                    -
+                </strong>
+            </p>
+
+        </div>
+
+        <div class="reminder-message">
+    <strong>⏰ Reminder</strong>
+    <p id="reminderMessage">
+        Checking your parking time...
+    </p>
+</div>
+        
+
+    <div class="confirmation-buttons">
+
+    <button
+        class="primary-button"
+        onclick="markArriving()">
+        ✅ I Will Reach Parking
+    </button>
+
+    <button
+        class="secondary-button"
+        onclick="cancelBooking()">
+        ❌ Cancel Parking Slot
+    </button>
+
+    <a href="extend.html" class="primary-button">
+        Extend Parking Time
+    </a>
+
+    <a href="bookings.html" class="secondary-button">
+        View Booking
+    </a>
+
+</div>  
+
+    </section>
+
+</main>
+
+
+<script src="js/script.js"></script>
+
+
+<script>
+
+async function loadReminder() {
+
+    let bookingId =
+        parseInt(
+            localStorage.getItem("bookingId")
+        );
+
+
+    if (!bookingId) {
+
+        alert("Booking not found.");
+
+        return;
+    }
+
+
+    try {
+
+        let response =
+            await fetch(
+                "http://localhost:8080/api/bookings"
+            );
+
+
+        let bookings =
+            await response.json();
+
+
+        let booking =
+            bookings.find(
+                b => b.bookingId === bookingId
+            );
+
+
+        if (!booking) {
+
+            alert("Booking not found.");
+
+            return;
+        }
+
+        document.getElementById(
+    "reminderParking"
+).textContent =
+    booking.parkingName +
+    " - " +
+    booking.parkingLocation;
+
+        document.getElementById(
+            "reminderSlot"
+        ).textContent =
+            booking.slotNumber;
+
+
+        document.getElementById(
+            "reminderVehicle"
+        ).textContent =
+            booking.vehicleNumber;
+
+
+        document.getElementById(
+            "reminderTime"
+        ).textContent =
+            booking.startTime +
+            " - " +
+            booking.endTime;
+            updateReminderMessage(booking);
+
+    }
+
+    catch (error) {
+
+        console.log(error);
+
+    }
+
+}
+
+if ("Notification" in window) {
+    Notification.requestPermission();
+}
+
+loadReminder();
+
+function updateReminderMessage(booking) {
+
+    let message =
+        document.getElementById("reminderMessage");
+
+    if (booking.status === "Cancelled") {
+        message.textContent =
+            "❌ This parking booking has been cancelled.";
+        return;
+    }
+
+    let startDateTime =
+        new Date(
+            booking.bookingDate +
+            "T" +
+            booking.startTime
+        );
+
+    let now = new Date();
+
+    let difference =
+        startDateTime.getTime() -
+        now.getTime();
+
+    let minutes =
+        Math.floor(difference / (1000 * 60));
+
+    if (minutes > 30) {
+
+        message.textContent =
+            "Your parking starts at " +
+            booking.startTime +
+            ". Please reach the parking area on time.";
+
+    } else if (minutes > 0) {
+
+        message.textContent =
+            "⏰ Your parking starts in " +
+            minutes +
+            " minutes.";
+
+    } else {
+
+        message.textContent =
+            "⚠️ Your parking time has started. Please reach the parking area.";
+    }
+}
+
+setInterval(loadReminder,30000);
+
+async function markArriving() {
+
+    let bookingId =
+        localStorage.getItem("bookingId");
+
+    if (!bookingId) {
+        alert("Booking not found.");
+        return;
+    }
+
+    try {
+
+        let response = await fetch(
+            "http://localhost:8080/api/bookings/"
+            + bookingId
+            + "/arrive",
+            {
+                method: "PUT"
+            }
+        );
+
+        if (response.ok) {
+            alert("Great! Your arrival is confirmed.");
+            loadReminder();
+        } else {
+            alert("Unable to update booking.");
+        }
+
+    } catch (error) {
+        console.log(error);
+        alert("Server error.");
+    }
+}
+
+
+async function cancelBooking() {
+
+    let bookingId =
+        localStorage.getItem("bookingId");
+
+    if (!bookingId) {
+        alert("Booking not found.");
+        return;
+    }
+
+    let confirmCancel =
+        confirm("Are you sure you want to cancel this parking slot?");
+
+    if (!confirmCancel) {
+        return;
+    }
+
+    try {
+
+        let response = await fetch(
+            "http://localhost:8080/api/bookings/"
+            + bookingId
+            + "/cancel",
+            {
+                method: "PUT"
+            }
+        );
+
+        if (response.ok) {
+            alert("Parking slot cancelled successfully.");
+            window.location.href = "bookings.html";
+        } else {
+            alert("Unable to cancel booking.");
+        }
+
+    } catch (error) {
+        console.log(error);
+        alert("Server error.");
+    }
+}
+
+</script>
+
+</body>
+
+</html>

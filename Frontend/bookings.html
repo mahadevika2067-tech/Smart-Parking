@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ParkSmart - My Bookings</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+
+<body>
+
+<header>
+
+    <div class="logo">🚗 ParkSmart</div>
+
+    <nav>
+
+        <a href="dashboard.html">
+            Dashboard
+        </a>
+
+        <a href="parking.html">
+            Find Parking
+        </a>
+
+        <a href="vehicles.html">
+            My Vehicles
+        </a>
+
+        <button
+            onclick="logoutUser()"
+            class="logout-button">
+
+            Logout
+
+        </button>
+
+    </nav>
+
+</header>
+
+
+<main class="dashboard">
+
+    <div class="welcome">
+
+        <div>
+
+            <h1>My Bookings 📅</h1>
+
+            <p>
+                View and manage your parking bookings.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <section
+        class="booking-container"
+        id="bookingContainer">
+
+        <!-- Bookings will come from MySQL -->
+
+    </section>
+
+
+</main>
+
+
+<script src="js/script.js"></script>
+
+
+<script>
+
+async function loadBookings() {
+
+    try {
+
+        let response =
+            await fetch("http://localhost:8080/api/bookings");
+
+        let bookings =
+            await response.json();
+
+        let container =
+            document.getElementById("bookingContainer");
+
+        container.innerHTML = "";
+
+        bookings.forEach(booking => {
+
+            let card =
+                document.createElement("div");
+
+            card.className = "booking-card";
+
+            card.innerHTML = `
+
+                <h3>${booking.parkingName}</h3>
+
+<p>
+    📍 ${booking.parkingLocation}
+</p>
+                    
+                        🚗 Vehicle:
+                        ${booking.vehicleNumber}
+                    </p>
+
+                    <p>
+                        📅 Date:
+                        ${booking.bookingDate}
+                    </p>
+
+                    <p>
+                        🅿️ Slot:
+                        ${booking.slotNumber}
+                    </p>
+
+                    <p>
+                        ⏰ Time:
+                        ${booking.startTime}
+                        - ${booking.endTime}
+                    </p>
+
+                </div>
+
+
+                <div class="booking-status">
+
+                <span class="${booking.status === 'Cancelled' ? 'status-cancelled' : 'status-active'}">
+    ${booking.status}
+</span>
+                <button
+    class="primary-button"
+    onclick="selectBookingForExtension(${booking.bookingId})">
+
+    Extend Time
+
+</button>
+
+                </div>
+
+            `;
+
+            container.appendChild(card);
+
+        });
+
+    } catch (error) {
+
+        console.log(error);
+
+    }
+
+}
+
+
+loadBookings();
+
+function selectBookingForExtension(bookingId) {
+
+    localStorage.setItem("extensionBookingId", bookingId);
+
+    window.location.href = "extend.html";
+}
+
+</script>
+
+
+</body>
+
+</html>

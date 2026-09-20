@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ParkSmart - Find Parking</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 ParkSmart
+    </div>
+
+    <nav>
+
+        <a href="dashboard.html">
+            Dashboard
+        </a>
+
+        <a href="bookings.html">
+            My Bookings
+        </a>
+
+        <a href="vehicles.html">
+            My Vehicles
+        </a>
+
+        <button
+            onclick="logoutUser()"
+            class="logout-button">
+
+            Logout
+
+        </button>
+
+    </nav>
+
+</header>
+
+
+<main class="dashboard">
+
+    <div class="welcome">
+
+        <div>
+
+            <h1>Find Parking 🅿️</h1>
+
+            <p>
+                Find an available parking slot near your location.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Search -->
+
+    <section class="search-section">
+
+        <h2>Search Parking</h2>
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="searchLocation"
+                placeholder="Enter parking location">
+
+            <button
+                class="primary-button"
+                onclick="searchParking()">
+
+                🔍 Search
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- Parking Locations -->
+
+    <h2 class="page-heading">
+        Available Parking Locations
+    </h2>
+
+
+    <section
+        class="parking-container"
+        id="parkingContainer">
+
+        <!-- Parking locations will come from MySQL -->
+
+    </section>
+
+</main>
+
+<script src="js/script.js"></script>
+
+</body>
+
+</html>

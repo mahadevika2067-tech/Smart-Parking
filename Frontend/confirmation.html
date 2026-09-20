@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ParkSmart - Booking Confirmed</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 ParkSmart
+    </div>
+
+    <nav>
+
+        <a href="dashboard.html">Dashboard</a>
+        <a href="parking.html">Find Parking</a>
+        <a href="bookings.html">My Bookings</a>
+
+        <button
+            onclick="logoutUser()"
+            class="logout-button">
+
+            Logout
+
+        </button>
+
+    </nav>
+
+</header>
+
+
+<main class="dashboard">
+
+    <section class="confirmation-card">
+
+        <div class="success-icon">
+            ✅
+        </div>
+
+        <h1>
+            Booking Confirmed!
+        </h1>
+
+        <p>
+            Your parking slot has been successfully reserved.
+        </p>
+
+
+        <div class="qr-code">
+
+            <div class="qr-placeholder">
+                ▦
+            </div>
+
+            <p>
+                Scan QR code at the parking entrance.
+            </p>
+
+        </div>
+
+
+        <div class="booking-summary">
+
+            <h3>Booking Details</h3>
+
+            <p>
+    Booking ID:
+    <strong id="confirmBookingId">-</strong>
+</p>
+
+<p>
+    Parking:
+    <strong id="confirmParking">-</strong>
+</p>
+
+            <p>
+                Slot:
+                <strong id="confirmSlot">-</strong>
+            </p>
+
+            <p>
+                Vehicle:
+                <strong id="confirmVehicle">-</strong>
+            </p>
+
+            <p>
+                Date:
+                <strong id="confirmDate">-</strong>
+            </p>
+
+            <p>
+                Time:
+                <strong id="confirmTime">-</strong>
+            </p>
+
+            <p>
+                Amount Paid:
+                <strong id="confirmAmount">-</strong>
+            </p>
+
+        </div>
+
+
+        <div class="confirmation-buttons">
+
+            <a
+                href="bookings.html"
+                class="primary-button">
+
+                View My Bookings
+
+            </a>
+
+
+            <a
+                href="dashboard.html"
+                class="secondary-button">
+
+                Go to Dashboard
+
+            </a>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script src="js/script.js"></script>
+
+
+<script>
+
+let bookingId =
+    localStorage.getItem("bookingId");
+
+let parkingName =
+    localStorage.getItem("selectedParkingName");
+
+let parkingLocation =
+    localStorage.getItem("selectedParkingLocation");
+
+let slot =
+    localStorage.getItem("selectedSlot");
+
+let vehicle =
+    localStorage.getItem("selectedVehicle");
+
+let date =
+    localStorage.getItem("bookingDate");
+
+let startTime =
+    localStorage.getItem("startTime");
+
+let amount =
+    localStorage.getItem("paymentAmount");
+
+
+document.getElementById("confirmBookingId").textContent =
+    "PS" + bookingId;
+
+document.getElementById("confirmParking").textContent =
+    parkingName + " - " + parkingLocation;
+
+document.getElementById("confirmSlot").textContent =
+    slot || "-";
+
+document.getElementById("confirmVehicle").textContent =
+    vehicle || "-";
+
+document.getElementById("confirmDate").textContent =
+    date || "-";
+
+document.getElementById("confirmTime").textContent =
+    startTime || "-";
+
+document.getElementById("confirmAmount").textContent =
+    "₹" + (amount || 0);
+
+</script>
+
+
+</body>
+
+</html>

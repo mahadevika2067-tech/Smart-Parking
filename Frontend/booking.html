@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ParkSmart - Make Booking</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        🚗 ParkSmart
+    </div>
+
+    <nav>
+
+        <a href="dashboard.html">Dashboard</a>
+
+        <a href="parking.html">Find Parking</a>
+
+        <a href="bookings.html">My Bookings</a>
+
+        <button
+            onclick="logoutUser()"
+            class="logout-button">
+
+            Logout
+
+        </button>
+
+    </nav>
+
+</header>
+
+
+<main class="dashboard">
+
+    <div class="welcome">
+
+        <div>
+
+            <h1>Make a Booking 📅</h1>
+
+            <p>Enter your parking details.</p>
+
+        </div>
+
+    </div>
+
+
+    <section class="booking-form-card">
+
+        <h2>Parking Details</h2>
+
+
+        <label>Parking Location</label>
+
+        <input
+            type="text"
+            id="bookingParking"
+            readonly>
+
+
+        <label>Selected Slot</label>
+
+        <input
+            type="text"
+            id="selectedSlot"
+            readonly>
+
+
+        <label>Select Vehicle</label>
+
+        <select id="vehicleNumber">
+
+            <option value="">
+                Select Vehicle
+            </option>
+
+        </select>
+
+
+        <label>Select Date</label>
+
+        <input
+            type="date"
+            id="bookingDate">
+
+
+        <label>Start Time</label>
+
+        <input
+            type="time"
+            id="startTime">
+
+
+        <label>Parking Duration</label>
+
+        <select id="duration">
+
+            <option value="1">1 Hour</option>
+            <option value="2">2 Hours</option>
+            <option value="3">3 Hours</option>
+            <option value="4">4 Hours</option>
+
+        </select>
+
+
+        <div class="booking-summary">
+
+            <h3>Booking Summary</h3>
+
+            <p>
+    Parking Fee:
+    <strong id="parkingFee">₹0 / hour</strong>
+</p>
+
+            <p>
+                Selected Slot:
+                <strong id="summarySlot">-</strong>
+            </p>
+
+            <p>
+                Status:
+                <strong>Ready for Booking</strong>
+            </p>
+
+        </div>
+
+
+        <button
+            class="primary-button full-button"
+            onclick="makeBooking()">
+
+            Continue to Payment →
+
+        </button>
+
+
+    </section>
+
+</main>
+
+
+<script src="js/script.js"></script>
+
+
+<script>
+
+async function loadVehiclesForBooking() {
+
+    try {
+
+        let response =
+            await fetch("http://localhost:8080/api/vehicles");
+
+        let vehicles =
+            await response.json();
+
+        let select =
+            document.getElementById("vehicleNumber");
+
+        vehicles.forEach(vehicle => {
+
+            let option =
+                document.createElement("option");
+
+            option.value =
+                vehicle.vehicleNumber;
+
+            option.textContent =
+                vehicle.vehicleNumber +
+                " - " +
+                vehicle.vehicleModel;
+
+            select.appendChild(option);
+
+        });
+
+    } catch (error) {
+
+        console.log(error);
+
+    }
+
+}
+
+
+function loadSelectedSlot() {
+
+    let slot =
+        localStorage.getItem("selectedSlot");
+
+    if (slot) {
+
+        document.getElementById("selectedSlot").value =
+            slot;
+
+        document.getElementById("summarySlot").textContent =
+            slot;
+
+    } else {
+
+        alert("Please select a parking slot first.");
+
+        window.location.href =
+            "slots.html";
+
+    }
+
+}
+
+
+async function makeBooking() {
+
+    let vehicle =
+        document.getElementById("vehicleNumber").value;
+
+    let date =
+        document.getElementById("bookingDate").value;
+
+    let startTime =
+        document.getElementById("startTime").value;
+
+    let duration =
+        parseInt(document.getElementById("duration").value);
+
+    let parkingPrice =
+    parseFloat(
+        localStorage.getItem("selectedParkingPrice")
+    ) || 0;
+
+    let slot =
+        localStorage.getItem("selectedSlot");
+    
+    let parkingName =
+    localStorage.getItem("selectedParkingName");
+
+let parkingLocation =
+    localStorage.getItem("selectedParkingLocation");
+
+    if (vehicle === "" ||
+        date === "" ||
+        startTime === "") {
+
+        alert("Please fill all booking details.");
+
+        return;
+
+    }
+
+
+    let start =
+        new Date("2000-01-01T" + startTime);
+
+    start.setHours(
+        start.getHours() + duration
+    );
+
+    let endTime =
+        start.toTimeString().slice(0, 5);
+   
+    let booking = {
+    userEmail: "user@gmail.com",
+    parkingName: parkingName,
+    parkingLocation: parkingLocation,
+    vehicleNumber: vehicle,
+    slotNumber: slot,
+    bookingDate: date,
+    startTime: startTime,
+    endTime: endTime,
+    status: "Confirmed"
+};
+    
+localStorage.setItem("selectedVehicle", vehicle);
+localStorage.setItem("bookingDate", date);
+localStorage.setItem("startTime", startTime);
+localStorage.setItem("duration", duration);
+
+    try {
+ 
+        let response =
+            await fetch(
+                "http://localhost:8080/api/bookings",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(booking)
+                }
+            );
+
+            if (response.ok) {
+    let result = await response.json();
+
+    localStorage.setItem("bookingId", result.bookingId);
+
+    alert("Booking created successfully!");
+    window.location.href = "payment.html";
+}
+ else {
+
+            alert("Booking failed!");
+
+        }
+
+    } catch (error) {
+
+        alert("Backend is not connected!");
+
+        console.log(error);
+
+    }
+
+}
+
+let parkingName =
+    localStorage.getItem("selectedParkingName");
+
+let parkingLocation =
+    localStorage.getItem("selectedParkingLocation");
+
+document.getElementById("bookingParking").value =
+    parkingName + " - " + parkingLocation;
+
+let parkingPrice =
+    localStorage.getItem("selectedParkingPrice") || 0;
+
+document.getElementById("parkingFee").textContent =
+    "₹" + parkingPrice + " / hour";
+
+loadVehiclesForBooking();
+loadSelectedSlot();
+
+
+</script>
+
+
+</body>
+
+</html>
