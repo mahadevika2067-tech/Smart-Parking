@@ -205,6 +205,9 @@ async function loadVehicles() {
 
     }
 }
+
+loadVehicles();
+
 async function deleteVehicle(id) {
 
     try {
@@ -288,7 +291,7 @@ container.innerHTML = "";
             container.appendChild(card);
 
         });
-
+ 
     } catch (error) {
 
         console.log(error);
