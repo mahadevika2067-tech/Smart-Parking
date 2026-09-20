@@ -34,4 +34,21 @@ public class ParkingSlotController {
     public void deleteSlot(@PathVariable int id) {
         parkingSlotRepository.deleteById(id);
     }
+    @PutMapping("/{id}")
+public ParkingSlot updateSlot(
+        @PathVariable int id,
+        @RequestBody ParkingSlot updatedSlot) {
+
+    ParkingSlot slot = parkingSlotRepository.findById(id).orElse(null);
+
+    if (slot == null) {
+        return null;
+    }
+
+    slot.setSlotNumber(updatedSlot.getSlotNumber());
+    slot.setStatus(updatedSlot.getStatus());
+    slot.setParkingId(updatedSlot.getParkingId());
+
+    return parkingSlotRepository.save(slot);
+}
 }
