@@ -246,9 +246,11 @@ async function loadParking() {
         let parkingList = await response.json();
 
         let container =
-            document.getElementById("parkingContainer");
+    document.getElementById("parkingContainer");
 
-        container.innerHTML = "";
+if (!container) return;
+
+container.innerHTML = "";
 
         parkingList.forEach(parking => {
 
