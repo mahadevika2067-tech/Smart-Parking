@@ -160,7 +160,7 @@ async function loadVehiclesForBooking() {
     try {
 
         let response =
-            await fetch("http://localhost:8080/api/vehicles");
+            await fetch("https://smart-parking-production-dc9c.up.railway.app/api/vehicles");
 
         let vehicles =
             await response.json();
@@ -289,7 +289,7 @@ localStorage.setItem("duration", duration);
  
         let response =
             await fetch(
-                "http://localhost:8080/api/bookings",
+                "https://smart-parking-production-dc9c.up.railway.app/api/bookings",
                 {
                     method: "POST",
 

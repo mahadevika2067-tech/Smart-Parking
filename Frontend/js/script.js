@@ -20,7 +20,7 @@ async function registerUser(event) {
     };
 
     try {
-        let response = await fetch("http://localhost:8080/api/users/register", {
+        let response = await fetch("https://smart-parking-production-dc9c.up.railway.app/api/users/register", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -58,7 +58,7 @@ async function loginUser(event) {
     };
 
     try {
-        let response = await fetch("http://localhost:8080/api/users/login", {
+        let response = await fetch("https://smart-parking-production-dc9c.up.railway.app/api/users/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -109,7 +109,7 @@ async function addVehicle() {
     try {
 
         let response = await fetch(
-            "http://localhost:8080/api/vehicles",
+            "https://smart-parking-production-dc9c.up.railway.app/api/vehicles",
             {
                 method: "POST",
 
@@ -149,7 +149,7 @@ async function loadVehicles() {
     try {
 
         let response = await fetch(
-            "http://localhost:8080/api/vehicles"
+            "https://smart-parking-production-dc9c.up.railway.app/api/vehicles"
         );
 
         let vehicles = await response.json();
@@ -210,7 +210,7 @@ async function deleteVehicle(id) {
     try {
 
         let response = await fetch(
-            "http://localhost:8080/api/vehicles/" + id,
+            "https://smart-parking-production-dc9c.up.railway.app/api/vehicles/" + id,
             {
                 method: "DELETE"
             }
@@ -240,7 +240,7 @@ async function loadParking() {
     try {
 
         let response = await fetch(
-            "http://localhost:8080/api/parking"
+            "https://smart-parking-production-dc9c.up.railway.app/api/parking"
         );
 
         let parkingList = await response.json();

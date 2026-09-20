@@ -118,7 +118,7 @@ async function loadSlots() {
     try {
 
         let response =
-            await fetch("http://localhost:8080/api/slots");
+            await fetch("https://smart-parking-production-dc9c.up.railway.app/api/slots");
 
         let slots =
             await response.json();
