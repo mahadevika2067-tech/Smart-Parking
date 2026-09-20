@@ -20,6 +20,11 @@ public class ParkingSlotController {
         return parkingSlotRepository.findAll();
     }
 
+    @GetMapping("/parking/{parkingId}")
+    public List<ParkingSlot> getSlotsByParking(@PathVariable int parkingId) {
+        return parkingSlotRepository.findByParkingId(parkingId);
+    }
+
     @PostMapping
     public ParkingSlot addSlot(@RequestBody ParkingSlot slot) {
         return parkingSlotRepository.save(slot);

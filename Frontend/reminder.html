@@ -163,7 +163,7 @@ async function loadReminder() {
 
         let response =
             await fetch(
-                "https://smart-parking-production-dc9c.up.railway.app/api/bookings"
+                "http://localhost:8080/api/bookings"
             );
 
 
@@ -290,7 +290,7 @@ async function markArriving() {
     try {
 
         let response = await fetch(
-            "https://smart-parking-production-dc9c.up.railway.app/api/bookings/"
+            "http://localhost:8080/api/bookings/"
             + bookingId
             + "/arrive",
             {
@@ -332,7 +332,7 @@ async function cancelBooking() {
     try {
 
         let response = await fetch(
-            "https://smart-parking-production-dc9c.up.railway.app/api/bookings/"
+            "http://localhost:8080/api/bookings/"
             + bookingId
             + "/cancel",
             {

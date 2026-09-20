@@ -3,6 +3,9 @@ package parksmart.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import parksmart.model.ParkingSlot;
 
-public interface ParkingSlotRepository
-        extends JpaRepository<ParkingSlot, Integer> {
+import java.util.List;
+
+public interface ParkingSlotRepository extends JpaRepository<ParkingSlot, Integer> {
+
+    List<ParkingSlot> findByParkingId(int parkingId);
 }

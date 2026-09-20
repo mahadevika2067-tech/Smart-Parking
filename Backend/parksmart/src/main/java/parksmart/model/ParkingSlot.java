@@ -1,4 +1,4 @@
- package parksmart.model;
+package parksmart.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,6 +14,7 @@ public class ParkingSlot {
 
     private String slotNumber;
     private String status;
+    private int parkingId;
 
     public ParkingSlot() {
     }
@@ -40,5 +41,13 @@ public class ParkingSlot {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public int getParkingId() {
+        return parkingId;
+    }
+
+    public void setParkingId(int parkingId) {
+        this.parkingId = parkingId;
     }
 }

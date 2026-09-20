@@ -320,7 +320,7 @@ amount =
 
         let response =
             await fetch(
-                "https://smart-parking-production-dc9c.up.railway.app/api/payments",
+                "http://localhost:8080/api/payments",
                 {
                     method: "POST",
 
@@ -349,7 +349,7 @@ amount =
 
             let updateResponse =
                 await fetch(
-                    "https://smart-parking-production-dc9c.up.railway.app/api/bookings/"
+                    "http://localhost:8080/api/bookings/"
                     + bookingId
                     + "/extend?newEndTime="
                     + encodeURIComponent(newEndTime),

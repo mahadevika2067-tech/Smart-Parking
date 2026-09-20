@@ -14,7 +14,6 @@
 
 </head>
 
-
 <body>
 
 <header>
@@ -59,8 +58,8 @@
             <h1>Select Parking Slot 🅿️</h1>
 
             <p id="selectedParking">
-    Loading parking location...
-</p>
+                Loading parking location...
+            </p>
 
         </div>
 
@@ -79,8 +78,6 @@
 
     </section>
 
-
-    <!-- Parking Slots -->
 
     <section class="slot-container" id="slotContainer">
 
@@ -117,8 +114,24 @@ async function loadSlots() {
 
     try {
 
+        let parkingId =
+            localStorage.getItem("selectedParkingId");
+
+        if (!parkingId) {
+
+            console.log("No parking selected.");
+
+            document.getElementById("slotContainer").innerHTML =
+                "<p>Please select a parking location first.</p>";
+
+            return;
+
+        }
+
         let response =
-            await fetch("https://smart-parking-production-dc9c.up.railway.app/api/slots");
+            await fetch(
+                "https://smart-parking-production-dc9c.up.railway.app/api/slots/parking/" + parkingId
+            );
 
         let slots =
             await response.json();
@@ -196,6 +209,8 @@ function continueBooking() {
         "booking.html";
 
 }
+
+
 let parkingName =
     localStorage.getItem("selectedParkingName");
 

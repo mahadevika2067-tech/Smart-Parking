@@ -85,7 +85,7 @@ async function loadBookings() {
     try {
 
         let response =
-            await fetch("https://smart-parking-production-dc9c.up.railway.app/api/bookings");
+            await fetch("http://localhost:8080/api/bookings");
 
         let bookings =
             await response.json();
